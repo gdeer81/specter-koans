@@ -7,15 +7,15 @@
    (= __  (do " you understand?" "YES"))
 
   "AFTER-ELEM navigates to the void element after the sequence. For transformations if the result is not NONE then append the value"
-   (= __ (setval AFTER-ELEM "Mary" ["Peter" "Paul"]
-                              (setval AFTER-ELEM "Mary" '("Peter" "Paul"))))
+   (= __ (setval AFTER-ELEM "Mary" ["Peter" "Paul"])
+         (setval AFTER-ELEM "Mary" '("Peter" "Paul")))
 
  "Nathan Says: AFTER-ELEM is only intended for transformations
   it doesn't make sense in the context of a set
   to add a single element to a set most efficiently use NONE-ELEM
   likewise, it doesn't make sense in the context of a map"
- (= __ (= #{"Peter" "Paul" "Mary"} (setval AFTER-ELEM "Mary" #{"Peter" "Paul" "Mary"})
-          (= {:name "Peter" :friend "Mary"} (setval AFTER-ELEM {:friend "Mary"} {:name "Peter"}))))
+ (= __ (= #{"Peter" "Paul" "Mary"} (setval AFTER-ELEM "Mary" #{"Peter" "Paul" "Mary"}))
+       (= {:name "Peter" :friend "Mary"} (setval AFTER-ELEM {:friend "Mary"} {:name "Peter"})))
 
  "ALL navigates to every element in a collection."
  (= __ (select ALL [0 1 2 3]))
@@ -30,9 +30,9 @@
  (= __ (transform ALL reverse {"Rich" :name "Clojure" :language-created}))
 
  "ALL can transform to NONE to remove elements"
- (= __ (setval [ALL nil?] NONE [1 nil 2 nil 3 nil]
-            (setval [ALL #(> % 100)] NONE [1 101 2 200 3 300])
-            (setval [ALL #(= "marker-node" (:type %))] NONE [1 {:type "marker-node"} 2 {:type "marker-node"} 3 {:type "marker-node"}])))
+ (= __ (setval [ALL nil?] NONE [1 nil 2 nil 3 nil])
+       (setval [ALL #(> % 100)] NONE [1 101 2 200 3 300])
+       (setval [ALL #(= "marker-node" (:type %))] NONE [1 {:type "marker-node"} 2 {:type "marker-node"} 3 {:type "marker-node"}]))
 
  "ATOM navigates to the value of an atom which is nice for transformations"
  (= __ (let [a (atom 41)]
@@ -54,20 +54,20 @@
  (= __ (setval END "believable" "un"))
 
  "DISPENSE Drops all collected values for subsequent navigation, so first lets see a transform without it..."
- (= __ (transform [ALL VAL] str (range 10)))
+ (= __ (transform [ALL VAL] str (range 4)))
 
  "...now lets see that same transform with DISPENSE thrown in..."
- (= __ (transform [ALL VAL DISPENSE] str (range 10)))
+ (= __ (transform [ALL VAL DISPENSE] str (range 4)))
 
  "FIRST navigates to the first element of a collection. If the collection is a map, returns a key-value pair [key value]. If the collection is empty, navigation stops."
- (= __ (select-one FIRST [:peanuts :the-butter :the-jelly]
-             (select-one FIRST (select-one FIRST (sorted-map :peanuts true
-                                                             :the-butter true
-                                                             :the-jelly true
-                                                             :some-banana false
-                                                             :some-cheese "wtf really?")))))
+ (= __ (select-one FIRST [:peanuts :the-butter :the-jelly])
+       (select-one FIRST (select-one FIRST (sorted-map :peanuts true
+                                                       :the-butter true
+                                                       :the-jelly true
+                                                       :some-banana false
+                                                       :some-cheese "wtf really?"))))
 
- "FIRST returns nil on an empt collection"
+ "FIRST returns nil on an empty collection"
  (= __ (select-one FIRST []))
 
  "FIRST can transform to NONE to remove elements"
@@ -107,9 +107,9 @@
 
  "As of Specter 1.0.0, LAST can now work with strings.
   It navigates to..."
- (= __ (select-any LAST "abc")
+ (= __ (select-any LAST "abc"))
 
-  "...or transforms characters.")
+ "...or transforms characters."
  (= __ (setval LAST "see" "abc"))
 
  "MAP-KEYS navigates to every key in a map.
@@ -163,9 +163,9 @@
  (= __ (select-one NIL->VECTOR nil))
 
  "NIL->LIST, NIL->SET, and NIL->VECTOR all stay on the current value if it isn't nil"
- (= __ (select-one NIL->LIST :some-val-other-than-nil
-                             (select-one NIL->SET :some-val-other-than-nil)
-                             (select-one NIL->VECTOR :some-val-other-than-nil)))
+ (= __ (select-one NIL->LIST :some-val-other-than-nil)
+       (select-one NIL->SET :some-val-other-than-nil)
+       (select-one NIL->VECTOR :some-val-other-than-nil))
 
  "NONE-ELEM navigates to the 'void' elem in a set. For transformations - if the result is not NONE, then add that value to the set."
  (= __ (setval NONE-ELEM 3 #{1 2}))

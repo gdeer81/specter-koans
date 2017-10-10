@@ -54,7 +54,9 @@
 
 "Add the sum of the evens to the first element of the seq using (collect ALL even?)"
 (= __
-   (transform [(collect ALL even?) FIRST] (fn [evens first] (reduce + first evens (range 5)))))
+  (transform [(collect ALL even?) FIRST]
+             (fn [evens first] (reduce + first evens))
+             (range 5)))
 
 "Replace the first element of the seq with the entire seq"
 (= __ (transform [(collect ALL) FIRST] (fn [all _] all) (range 3)))
@@ -82,14 +84,14 @@
 "comp-paths
  (comp-paths & path)
  Returns a compiled version of the given path for use with compiled-{select/transform/setval/etc.} functions."
-(= __ (let [my-path (comp-paths :a :b :c)])
-     (compiled-select-one my-path {:a {:b {:c 0}}}))
+(= __ (let [my-path (comp-paths :a :b :c)]
+       (compiled-select-one my-path {:a {:b {:c 0}}})))
 
 "compiled-*
 These functions operate in the same way as their uncompiled counterparts,
 but they require their path to be precompiled with comp-paths. also more performant"
-(= __ (let [my-path (comp-paths :outer :inner :destination)])
-     (compiled-select-one my-path {:outer {:inner {:destination 42}}})
+(= __ (let [my-path (comp-paths :outer :inner :destination)]
+       (compiled-select-one my-path {:outer {:inner {:destination 42}}}))
 
  "cond-path
  (cond-path & conds)
@@ -135,16 +137,16 @@ but they require their path to be precompiled with comp-paths. also more perform
  (= __ (do "Did you look at the implementation" "yes"))
 
  "filterer
-   (filterer & path)
-   Navigates to a view of the current sequence that only contains elements that match the given path.
-   An element matches the selector path if calling select on that element with
-   the path yields anything other than an empty sequence.
-   Returns a vector when used in a select.
-   The input path may be parameterized, in which case the result of filterer will
-   be parameterized in the order of which the parameterized selectors were declared.
-   Note that filterer is a function which returns a navigator.
-   It is the arguments to filterer that can be late-bound parameterized, not filterer.
-   See also subselect."
+  (filterer & path)
+  Navigates to a view of the current sequence that only contains elements that match the given path.
+  An element matches the selector path if calling select on that element with
+  the path yields anything other than an empty sequence.
+  Returns a vector when used in a select.
+  The input path may be parameterized, in which case the result of filterer will
+  be parameterized in the order of which the parameterized selectors were declared.
+  Note that filterer is a function which returns a navigator.
+  It is the arguments to filterer that can be late-bound parameterized, not filterer.
+  See also subselect."
  (= __ (select-one (filterer identity) ['() [] #{} {} "" true false nil]))
 
  "for filterer note that clojure functions have been extended to implement the navigator protocol"
@@ -496,8 +498,9 @@ but they require their path to be precompiled with comp-paths. also more perform
 
  "In this example note that (3 4) and (6 7) are not returned because the search halted at
           (2 (3 4) (5 (6 7)))."
- (= '((2 (3 4) 5 (6 7)) (8 9)) (select (walker #(and (counted? %) (even? (count %)))))
-      '(1 (2 (3 4) 5 (6 7)) (8 9)))
+ (= '((2 (3 4) 5 (6 7)) (8 9))
+     (select (walker #(and (counted? %) (even? (count %))))
+       '(1 (2 (3 4) 5 (6 7)) (8 9))))
 
  "In this example I don't even know whats going on, good luck..."
  (= '(1 :double :double)

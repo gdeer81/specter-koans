@@ -9,8 +9,9 @@
                         "hello"
                         "BOB"
                         nil
-                        3]}
-  "02_unparameterized_navigators" {"__" ["YES"
+                        3]}]
+  
+    ["02_unparameterized_navigators" {"__" ["YES"
                                          ["Peter" "Paul" "Mary"]
                                          false
                                          [0 1 2 3]
@@ -24,6 +25,8 @@
                                          "unbelievable"
                                          (range 0 11)
                                          "unbelievable"
+										 ["00" "11" "22" "33"]
+										 ["0" "1" "2" "3"]
                                          :peanuts
                                          nil
                                          [1 2 3]
@@ -46,7 +49,7 @@
                                          {:meta :datum}
                                          ["key"]
                                          ["a" "b" "c"]
-                                         {a/q 3, bbb/q 4, q 5}
+                                         {'a/q 3, 'bbb/q 4, 'q 5}
                                          ["koans.02-unparameterized-navigators" "koans.02-unparameterized-navigators"]
                                          ["koans.02-unparameterized-navigators" nil]
                                          [:a/test :a/fun]
@@ -60,9 +63,9 @@
                                          nil
                                          []
                                          [0 1 2 3 4]
-                                         [[(0 1 2) 0] [(0 1 2) 1] [(0 1 2) 2]]
-                                         [5 6 7 8 9]]}
-  "03_parameterized_navigators_and_functions" {"__" ["yes"
+                                         [['(0 1 2) 0] ['(0 1 2) 1] ['(0 1 2) 2]]
+                                         [5 6 7 8 9]]}]
+  ["03_parameterized_navigators_and_functions" {"__" ["yes"
                                                      [:a 1 2 3]
                                                      :com.rpl.specter.impl/NONE
                                                      [1 2 3]
