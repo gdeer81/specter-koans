@@ -182,89 +182,89 @@ but they require their path to be precompiled with comp-paths. also more perform
   Navigates to the specified key, navigating to nil if it does not exist.
   Note that this is different from stopping navigation if the key does not exist.
   If you want to stop navigation, use must."
- (= 0 (select-one (keypath :a) {:a 0}))
+ (= __ (select-one (keypath :a) {:a 0}))
 
  "using keypath like get-in"
- (= 1 (select-one (keypath :a :b) {:a {:b 1}}))
+ (= __ (select-one (keypath :a :b) {:a {:b 1}}))
 
  "using keypath when a map is missing the key"
- (= [0 nil] (select [ALL (keypath :a)] [{:a 0} {:b 1}]))
+ (= __ (select [ALL (keypath :a)] [{:a 0} {:b 1}]))
 
  "keypath does not stop navigation"
- (= [0 :boo] (select [ALL (keypath :a) (nil->val :boo)] [{:a 0} {:b 1}]))
+ (= __ (select [ALL (keypath :a) (nil->val :boo)] [{:a 0} {:b 1}]))
 
  "keypath can now take multiple arguments, for concisely specifying multiple steps.
   It navigates to each key one after another. Here is a one-step..."
- (= {"in" 3} (select-one (keypath "out") {"out" {"in" 3}}))
+ (= __ (select-one (keypath "out") {"out" {"in" 3}}))
 
  "and here is keypath with multiple arguments"
- (= 3 (select-one (keypath "out" "in") {"out" {"in" 3}}))
+ (= __ (select-one (keypath "out" "in") {"out" {"in" 3}}))
 
  "keypath can transform to NONE to remove elements"
- (= {:b 4} (setval [(keypath :a)] NONE {:a 3 :b 4}))
+ (= __ (setval [(keypath :a)] NONE {:a 3 :b 4}))
 
  "map-key
   (map-key key)
   Navigates to the given key in the map (not to the value)."
- (= [:a] (select [(map-key :a)] {:a 2 :b 3}))
+ (= __ (select [(map-key :a)] {:a 2 :b 3}))
 
  "using setval with map-key is confusing since the val is the key so setval with
   map-key should be thought of as setkey, example, the key :c will replace :a"
- (= {:b 3, :c 2} (setval [(map-key :a)] :c {:a 2 :b 3}))
+ (= __ (setval [(map-key :a)] :c {:a 2 :b 3}))
 
  "map-key navigates only if the key currently exists in the map."
- (= []  (select [(map-key :z)] {:a 2 :b 3}))
+ (= __  (select [(map-key :z)] {:a 2 :b 3}))
 
  "Can transform to NONE to remove the key/value pair from the map."
- (= {:b 3} (setval [(map-key :a)] NONE {:a 2 :b 3}))
+ (= __ (setval [(map-key :a)] NONE {:a 2 :b 3}))
 
  "multi-path
   (multi-path & paths)
   A path that branches on multiple paths.
   For transforms, applies updates to the paths in order."
- (= '(0 1) (select (multi-path :a :b) {:a 0, :b 1, :c 2}))
+ (= __ (select (multi-path :a :b) {:a 0, :b 1, :c 2}))
 
  "select with multiple filterer paths"
- (= '([1 3 5 7 9] [0 2 4 6 8]) (select (multi-path (filterer odd?) (filterer even?)) (range 10)))
+ (= __ (select (multi-path (filterer odd?) (filterer even?)) (range 10)))
 
  "multi-path with transform example"
- (= {:a -1 :b 0 :c 2} (transform (multi-path :a :b) (fn [x] (dec x)) {:a 0, :b 1, :c 2}))
+ (= __ (transform (multi-path :a :b) (fn [x] (dec x)) {:a 0, :b 1, :c 2}))
 
  "must
   (must & keys)
   Navigates to the key only if it exists in the map.
   Note that must stops navigation if the key does not exist.
   If you do not want to stop navigation, use keypath."
- (= 0 (select-one (must :a) {:a 0}))
+ (= __ (select-one (must :a) {:a 0}))
 
  "must stops navigation when the key doesn't exist"
- (= nil (select-one (must :a) {:b 1}))
+ (= __ (select-one (must :a) {:b 1}))
 
  "must can now take multiple arguments, for concisely specifying multiple steps. It navigates to each key, one after another."
- (= 2 (select-any (must :a :b) {:a {:b 2} :c 3}))
+ (= __ (select-any (must :a :b) {:a {:b 2} :c 3}))
 
  "must can transform to NONE to remove elements."
- (= {:b 2} (setval (must :a) NONE {:a 1 :b 2}))
+ (= __ (setval (must :a) NONE {:a 1 :b 2}))
 
  "nil->val
    (nil->val v)
    Navigates to the provided val if the structure is nil. Otherwise it stays navigated at the structure."
- (= :a (select-one (nil->val :a) nil))
+ (= __ (select-one (nil->val :a) nil))
 
  "example where the structure is not nil"
- (= :b (select-one (nil->val :a) :b))
+ (= __ (select-one (nil->val :a) :b))
 
  "nthpath
   (nthpath & indices)
   Navigate to the specified indices (one after another). "
- (= [3] (select [(nthpath 2)] [1 2 3]))
+ (= __ (select [(nthpath 2)] [1 2 3]))
 
  "Transform to NONE to remove the element from the sequence."
- (= [1 2] (setval [(nthpath 2)] NONE [1 2 3]))
+ (= __ (setval [(nthpath 2)] NONE [1 2 3]))
 
  "nthpath can now take multiple arguments, for concisely specifying multiple steps.
   It navigates to each index, one after another."
- (= [0] (select [(nthpath 0 0)] [[0 1 2] 2 3]))
+ (= __ (select [(nthpath 0 0)] [[0 1 2] 2 3]))
 
  "parser
    (parser parse-fn unparse-fn)
@@ -273,14 +273,14 @@ but they require their path to be precompiled with comp-paths. also more perform
    run on it to get the final value at this point."
  (let [parse (fn [address] (clojure.string/split address #"@"))
        unparse (fn [address] (clojure.string/join "@" address))]
-    (= [["test" "gmail.com"]]
+    (= __
        (select [ALL (parser parse unparse) #(= "gmail.com" (second %))]
                ["test@example.com" "test@gmail.com"])))
 
  "parser with a transform"
  (let [parse (fn [address] (clojure.string/split address #"@"))
        unparse (fn [address] (clojure.string/join "@" address))]
-    (= ["test@example.com" "test+spam@gmail.com"]
+    (= __
        (transform [ALL (parser parse unparse) #(= "gmail.com" (second %))]
                   (fn [[name domain]] [(str name "+spam") domain])
                   ["test@example.com" "test@gmail.com"])))
@@ -290,32 +290,32 @@ but they require their path to be precompiled with comp-paths. also more perform
    Keeps the element only if it matches the supplied predicate.
    This is the late-bound parameterized version of using a function directly in a path.
    See also must."
- (= [0 2 4 6 8] (select [ALL (pred even?)] (range 10)))
+ (= __ (select [ALL (pred even?)] (range 10)))
 
  "pred=
    (pred= value)
    Keeps elements only if they equal the provided value."
- (= [2 2] (select [ALL (pred= 2)] [1 2 2 3 4 0]))
+ (= __ (select [ALL (pred= 2)] [1 2 2 3 4 0]))
 
  "pred<
    (pred< value)
    Keeps elements only if they are less than the provided value."
- (= [1 2 2 0] (select [ALL (pred< 3)] [1 2 2 3 4 0]))
+ (= __ (select [ALL (pred< 3)] [1 2 2 3 4 0]))
 
  "pred>
    (pred> value)
    Keeps elements only if they are greater than the provided value."
- (=  [4] (select [ALL (pred> 3)] [1 2 2 3 4 0]))
+ (=  __ (select [ALL (pred> 3)] [1 2 2 3 4 0]))
 
  "pred<=
    (pred<= value)
    Keeps elements only if they are less than or equal to the provided value."
- (= [1 2 2 3 0] (select [ALL (pred<= 3)] [1 2 2 3 4 0]))
+ (= __ (select [ALL (pred<= 3)] [1 2 2 3 4 0]))
 
  "pred>=
    (pred>= value)
    Keeps elements only if they are greater than or equal to the provided value."
- (= [3 4] (select [ALL (pred>= 3)] [1 2 2 3 4 0]))
+ (= __ (select [ALL (pred>= 3)] [1 2 2 3 4 0]))
 
  "putval
    (putval val)
@@ -323,7 +323,7 @@ but they require their path to be precompiled with comp-paths. also more perform
    Useful when additional arguments are required to the transform function that
    would otherwise require partial application or a wrapper function.
    example incrementing val at path [:a :b] by 3:"
- (= {:a {:b 3}} (transform [:a :b (putval 3)] + {:a {:b 0}}))
+ (= __ (transform [:a :b (putval 3)] + {:a {:b 0}}))
 
  "not-selected?
     (not-selected? & path)
@@ -332,13 +332,13 @@ but they require their path to be precompiled with comp-paths. also more perform
     The input path may be parameterized, in which case the result of selected?
     will be parameterized in the order of which the parameterized navigators were declared.
     See also selected?."
- (= [1 3 5 7 9] (select [ALL (not-selected? even?)] (range 10)))
+ (= __ (select [ALL (not-selected? even?)] (range 10)))
 
  "selection must be :a but must not have been selected with the even? predicate"
- (= [{:a 1} {:a 3}] (select [ALL (not-selected? [(must :a) even?])] [{:a 0} {:a 1} {:a 2} {:a 3}]))
+ (= __ (select [ALL (not-selected? [(must :a) even?])] [{:a 0} {:a 1} {:a 2} {:a 3}]))
 
  "Path returns [0 2], so navigation stops"
- (= nil (select-one (not-selected? [ALL (must :a) even?]) [{:a 0} {:a 1} {:a 2} {:a 3}]))
+ (= __ (select-one (not-selected? [ALL (must :a) even?]) [{:a 0} {:a 1} {:a 2} {:a 3}]))
 
  "selected?
     (selected? & path)
@@ -347,25 +347,25 @@ but they require their path to be precompiled with comp-paths. also more perform
     The input path may be parameterized, in which case the result of selected?
     will be parameterized in the order of which the parameterized navigators were declared.
     See also not-selected?."
- (= [0 2 4 6 8] (select [ALL (selected? even?)] (range 10)))
+ (= __ (select [ALL (selected? even?)] (range 10)))
 
  "selection must be :a and have been selected with the even? predicate"
- (= [{:a 0} {:a 2}] (select [ALL (selected? [(must :a) even?])] [{:a 0} {:a 1} {:a 2} {:a 3}]))
+ (= __ (select [ALL (selected? [(must :a) even?])] [{:a 0} {:a 1} {:a 2} {:a 3}]))
 
  "Path returns [0 2], so selected? returns the entire structure"
- (= [{:a 0} {:a 1} {:a 2} {:a 3}] (select-one (selected? [ALL (must :a) even?]) [{:a 0} {:a 1} {:a 2} {:a 3}]))
+ (= __ (select-one (selected? [ALL (must :a) even?]) [{:a 0} {:a 1} {:a 2} {:a 3}]))
 
  "set-elem
     (set-elem element)
     Navigates to the given element in the set only if it exists in the set.
     Can transform to NONE to remove the element from the set."
- (= [3] (select [(set-elem 3)] #{3 4 5}))
+ (= __ (select [(set-elem 3)] #{3 4 5}))
 
  "set-elem won't navigate to the element since it doesn't exist"
- (= [] (select [(set-elem 3)] #{4 5}))
+ (= __ (select [(set-elem 3)] #{4 5}))
 
  "use setval with NONE to remove an element"
- (= #{4 5} (setval [(set-elem 3)] NONE #{3 4 5}))
+ (= __ (setval [(set-elem 3)] NONE #{3 4 5}))
 
  "srange
      (srange start end)
@@ -373,52 +373,52 @@ but they require their path to be precompiled with comp-paths. also more perform
      start (inclusive) and end (exclusive)
      Will throw IndexOutOfBoundsException
      See also srange-dynamic."
- (= [2 3] (select-one (srange 2 4) (range 5)))
+ (= __ (select-one (srange 2 4) (range 5)))
 
  "use setval with srange and empty collection to remove values"
- (= '(0 1 4) (setval (srange 2 4) [] (range 5)))
+ (= __ (setval (srange 2 4) [] (range 5)))
 
  "As of Specter 1.0.0, srange can now work with strings. It navigates to or transforms substrings."
- (= "bc" (select-any (srange 1 3) "abcd"))
+ (= __ (select-any (srange 1 3) "abcd"))
 
  "srange with setval to remove from a string"
- (= "ad" (setval (srange 1 3) "" "abcd"))
+ (= __ (setval (srange 1 3) "" "abcd"))
 
  "use srange to add a letter to a string"
- (= "abcxd" (setval [(srange 1 3) END] "x" "abcd"))
+ (= __ (setval [(srange 1 3) END] "x" "abcd"))
 
  "srange-dynamic
      (srange-dynamic start-fn end-fn)
      Uses start-fn and end-fn to determine the bounds of the subsequence to select when navigating.
      Each function takes in the structure as input.
      See also srange."
- (= [2 3] (select-one (srange-dynamic #(.indexOf % 2) #(.indexOf % 4)) (range 5)))
+ (= __ (select-one (srange-dynamic #(.indexOf % 2) #(.indexOf % 4)) (range 5)))
 
  "using srange-dynamic with start-fn that always returns 0 and end-fn returns half the count"
- (= [0 1 2 3 4] (select-one (srange-dynamic (fn [_] 0) #(quot (count %) 2)) (range 10)))
+ (= __ (select-one (srange-dynamic (fn [_] 0) #(quot (count %) 2)) (range 10)))
 
  "stay-then-continue
       (stay-then-continue)
       Navigates to the current element and then navigates via the provided path. This can be used to implement pre-order traversal.
       See also continue-then-stay."
- (= '({:a 0, :b 1, :c 2} 0 1 2) (select (stay-then-continue MAP-VALS) {:a 0 :b 1 :c 2}))
+ (= __ (select (stay-then-continue MAP-VALS) {:a 0 :b 1 :c 2}))
 
  "submap
       (submap m-keys)
       Navigates to the specified submap (using select-keys)"
- (= {:a 0, :b 1} (select-one (submap [:a :b]) {:a 0, :b 1, :c 2}))
+ (= __ (select-one (submap [:a :b]) {:a 0, :b 1, :c 2}))
 
  "example submap when key doesn't exist"
- (= {} (select-one (submap [:c]) {:a 0}))
+ (= __ (select-one (submap [:c]) {:a 0}))
 
  "In a transform, that submap in the original map is changed to the new value of the submap.
       example: (submap [:a :c]) returns {:a 0} with no :c"
- (= {:b 1, :a 1} (transform [(submap [:a :c]) MAP-VALS]
+ (= __ (transform [(submap [:a :c]) MAP-VALS]
                            inc
                            {:a 0, :b 1}))
 
  "We replace the empty submap with {:c 2} and merge with the original structure"
- (= {:a 0, :b 1, :c 2} (transform (submap []) #(assoc % :c 2) {:a 0, :b 1}))
+ (= __ (transform (submap []) #(assoc % :c 2) {:a 0, :b 1}))
 
  "subselect
        (subselect & path)
@@ -429,17 +429,17 @@ but they require their path to be precompiled with comp-paths. also more perform
        Requires that the input navigators will walk the structure's children in the
        same order when executed on select and then transform
        See also filterer."
- (= [1 [[[10]] 3] 5 [8 [7 6]] 2]
+ (= __
     (transform (subselect (walker number?) even?) reverse [1 [[[2]] 3] 5 [6 [7 8]] 10]))
 
  "subset
        (subset aset)
        Navigates to the specified subset (by taking an intersection).
        In a transform, that subset in the original set is changed to the new value of the subset."
- (= #{:b} (select-one (subset #{:a :b}) #{:b :c}))
+ (= __ (select-one (subset #{:a :b}) #{:b :c}))
 
  "Replaces the #{:a} subset with #{:a :c} and unions back into the original structure"
- (= #{:c :b :a} (setval (subset #{:a}) #{:a :c} #{:a :b}))
+ (= __ (setval (subset #{:a}) #{:a :c} #{:a :b}))
 
  "terminal
         (terminal update-fn)
@@ -450,10 +450,10 @@ but they require their path to be precompiled with comp-paths. also more perform
         with collected values given as the first arguments.
         See also terminal-val and multi-transform."
 
- (= 4 (multi-transform [(putval 3) (terminal +)] 1))
+ (= __ (multi-transform [(putval 3) (terminal +)] 1))
 
  "inc :c and add 3 to :d"
- (= {:a {:b {:c 43, :d 4}}}
+ (= __
     (multi-transform [:a :b (multi-path [:c (terminal inc)]
                                         [:d (putval 3) (terminal +)])]
                      {:a {:b {:c 42 :d 1}}}))
@@ -463,7 +463,7 @@ but they require their path to be precompiled with comp-paths. also more perform
         Added in 0.12.0
         Like terminal but specifies a val to set at the location
         regardless of the collected values or the value at the location."
- (= 2 (multi-transform (terminal-val 2) 3))
+ (= __ (multi-transform (terminal-val 2) 3))
 
  "transformed
          (transformed path update-fn)
@@ -471,21 +471,21 @@ but they require their path to be precompiled with comp-paths. also more perform
          The input path may be parameterized, in which case the result of transformed
          will be parameterized in the order of which the parameterized navigators were declared.
          See also view"
- (= '(0 2 2 6 4 10 6 14 8 18) (select-one (transformed [ALL odd?] #(* % 2)) (range 10)))
+ (= __ (select-one (transformed [ALL odd?] #(* % 2)) (range 10)))
 
  "transform the transformation of double all odds by dividing the whole thing by 2"
- (= '(0 1 1 3 2 5 3 7 4 9) (transform [(transformed [ALL odd?] #(* % 2)) ALL] #(/ % 2) (range 10)))
+ (= __ (transform [(transformed [ALL odd?] #(* % 2)) ALL] #(/ % 2) (range 10)))
 
  "traversed
           (traversed path reduce-fn)
           Navigates to a view of the current value by transforming with a reduction over the specified traversal."
- (= 10 (select-any (traversed ALL +) [1 2 3 4]))
+ (= __ (select-any (traversed ALL +) [1 2 3 4]))
 
  "view
           (view afn)
           Navigates to result of running afn on the currently navigated value.
           See also transformed."
- (= 1 (select-one [FIRST (view inc)] (range 5)))
+ (= __ (select-one [FIRST (view inc)] (range 5)))
 
  "walker
           (walker afn)
@@ -494,16 +494,16 @@ but they require their path to be precompiled with comp-paths. also more perform
           walker stops searching that branch of the tree and continues
           its search of the rest of the data structure.
           See also codewalker"
- (= '(4 2 6) (select (walker #(and (number? %) (even? %))) '(1 (3 4) 2 (6))))
+ (= __ (select (walker #(and (number? %) (even? %))) '(1 (3 4) 2 (6))))
 
  "In this example note that (3 4) and (6 7) are not returned because the search halted at
           (2 (3 4) (5 (6 7)))."
- (= '((2 (3 4) 5 (6 7)) (8 9))
+ (= __
      (select (walker #(and (counted? %) (even? (count %))))
        '(1 (2 (3 4) 5 (6 7)) (8 9))))
 
  "In this example I don't even know whats going on, good luck..."
- (= '(1 :double :double)
+ (= __
      (setval (walker #(and (counted? %) (even? (count %))))
             :double
             '(1 (2 (3 4) 5 (6 7)) (8 9)))))
